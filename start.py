@@ -28,7 +28,7 @@ class AIThread(QThread):
         # getBestPosition(color, alpha, beta, method) -> method represents the algorithm use
         # method = 1 -> alpha-beta pruning
         # method = 2 -> even better performance
-        bestPos = ai.getBestPosition(2, alpha, beta, 1)
+        bestPos = ai.getBestPosition(2, alpha, beta, 2)
         """
         for i in range(15):
             for j in range(15):

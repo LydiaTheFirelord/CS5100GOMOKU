@@ -27,8 +27,6 @@ class newAI:
         if method == 2:
             return self.better_performance()
 
-
-
     # Initialize blackPos, whitePos, occupied according to chessboard
     def _init_black_white(self):
         for i in range(15):
@@ -53,7 +51,7 @@ class newAI:
     # Wrapper for alpha beta pruning function
     def alpha_beta(self, color, alpha, beta):
         self._init_black_white()
-        self.searchRange = utils.getSearchRange()
+        self.searchRange = utils.getSearchRange(self.occupied)
         # Depth is 4
         print("alpha beta called________________________")
         self._alpha_beta(color, self.maxDepth, alpha, beta)
@@ -119,7 +117,7 @@ class newAI:
     # wrapper for better performance algorithm
     def better_performance(self):
         self._init_black_white()
-        self.searchRange = utils.getSearchRange()
+        self.searchRange = utils.getSearchRange(self.occupied)
         pos = self._better_performance()
         self.updateChessBoard()
         return pos
@@ -137,12 +135,12 @@ class newAI:
                     self.whitePos[i][j] = 1
 
                     # Use calculateScoreBetter to do even better
-                    white_score = evaluation.calculateScore(2, i, j)
+                    white_score = evaluation.calculateScore(2, i, j, self.blackPos, self.whitePos)
 
                     self.whitePos[i][j] = 0
                     self.blackPos[i][j] = 1
 
-                    black_score = evaluation.calculateScore(1, i, j)
+                    black_score = evaluation.calculateScore(1, i, j, self.blackPos, self.whitePos)
 
                     self.blackPos[i][j] = 0
                     self.occupied[i][j] = 0
