@@ -7,6 +7,7 @@ from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel
 from AI import AI
 from newAI import newAI
+from alpha_beta_AI import AlphaBetaAI
 from gobang_ui import Ui_MainWindow
 from copy import deepcopy
 
@@ -20,7 +21,10 @@ class AIThread(QThread):
         self.chessboard = chessboard
 
     def run(self):
-        ai = newAI(self.chessboard)
+        ai = AlphaBetaAI(self.chessboard, 2) # my color: 2
+        bestPos = ai.FindNextMove()
+
+        # ai = newAI(self.chessboard)
         alpha = -100000000
         beta = 100000000
 
@@ -28,7 +32,8 @@ class AIThread(QThread):
         # getBestPosition(color, alpha, beta, method) -> method represents the algorithm use
         # method = 1 -> alpha-beta pruning
         # method = 2 -> even better performance
-        bestPos = ai.getBestPosition(2, alpha, beta, 1)
+        # bestPos = ai.getBestPosition(2, alpha, beta, 2)
+
         """
         for i in range(15):
             for j in range(15):
