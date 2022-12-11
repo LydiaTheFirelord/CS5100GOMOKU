@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/macos,pycharm,python
-# Edit at https://www.toptal.com/developers/gitignore?templates=macos,pycharm,python
+# Created by https://www.toptal.com/developers/gitignore/api/macos,python,pycharm,visualstudiocode
+# Edit at https://www.toptal.com/developers/gitignore?templates=macos,python,pycharm,visualstudiocode
 
 ### macOS ###
 # General
@@ -314,4 +314,23 @@ cython_debug/
 poetry.toml
 
 
-# End of https://www.toptal.com/developers/gitignore/api/macos,pycharm,python
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+.ionide
+
+# End of https://www.toptal.com/developers/gitignore/api/macos,python,pycharm,visualstudiocode
