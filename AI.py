@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 class AI:
-    def __init__(self,chessboard):
+    def __init__(self,chessboard, color):
         self.chessboard = chessboard
+        self.color = color
         self.size = len(chessboard)
         self.count = 0
     #color表示下棋的那一方，deep表示推演深度,pre_evaluate表示上一层的评估值
     def ai(self,color,deep,pre_evaluate):
         #递归边界
         if deep >= 2:
-            temp = self.evaluateBoard(2,self.chessboard) - self.evaluateBoard(1,self.chessboard)
+            temp = self.evaluateBoard(self.color ,self.chessboard) - self.evaluateBoard(3 - self.color,self.chessboard)
             #print("{}:{}".format(deep, temp))
             return temp
         #values初始值
-        if color == 2:
+        if color == self.color:
             values = -100000000
         else:
             values = 100000000
@@ -28,7 +29,7 @@ class AI:
                     self.chessboard[i][j][2] = color
                     #递归评估
                     evaluate = self.ai(3-color,deep+1,values)
-                    if color == 2:
+                    if color == self.color:
                         # 剪枝，如果当前的评估值比最小的pre_evaluate要大就跳过该情况，注意要回溯
                         if evaluate > pre_evaluate:
                             # 回溯
@@ -43,7 +44,7 @@ class AI:
                             self.count += 1
                             return -100000000
                     #如果是白子回合，应当取评估值的最大值
-                    if color == 2:
+                    if color == self.color:
                         # #如果当前白子下法能完成五连，则将evaluate设一个较大的值
                         # if self.judge(i,j):
                         #     evaluate = 10000000
@@ -55,7 +56,6 @@ class AI:
                             values = evaluate
                     #回溯
                     self.chessboard[i][j][2] = 0
-                    print("current chessboard status", self.chessboard)
         #print("{}:{}".format(deep,values))
         return values
     #如果该点周围米字方向上两格都为空，就跳过该点
@@ -209,11 +209,10 @@ class AI:
                             # 即record中0的个数为1，且record[1]或record[3]是0,record.count(color) == 4
                             if (count == 1 and record[1] == 0 and record.count(color) == 4) or (count == 1 and record[3] == 0 and record.count(color) == 4):
                                 values += 3000
-
+                                #print("*** 0 * 或* 0 * **:{}".format(record))
+                            # 如果是 ** 0 ** 的情况，则values += 2600;
                             if count == 1 and record[2] == 0 and record.count(color) == 4:
                                 values += 2600
-
+                                #print("** 0 **:{}".format(record))
                         k += 1
         return values
-
-
