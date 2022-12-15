@@ -4,6 +4,7 @@ from piece import BOARD_SIZE, Piece
 
 from AI import AI
 from newAI import newAI
+from alpha_beta_AI import AlphaBetaAI
 
 class Agent():
     """
@@ -93,5 +94,13 @@ class NewAgent(Agent):
         alpha = -100000000
         beta = 100000000
         bestPos = ai.getBestPosition(self.color, alpha, beta, 2)
+
+        return (bestPos[0], bestPos[1])
+
+class NewAlphaBetaAgent(Agent):
+    def _normal_move(self, board: List[List[Piece]]) -> Tuple[int, int]:
+        chessboard = self._parse_board(board)
+        ai = AlphaBetaAI(chessboard, self.color)
+        bestPos = ai.FindNextMove()
 
         return (bestPos[0], bestPos[1])
