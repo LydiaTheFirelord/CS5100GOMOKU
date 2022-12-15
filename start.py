@@ -11,6 +11,11 @@ from alpha_beta_AI import AlphaBetaAI
 from gobang_ui import Ui_MainWindow
 from copy import deepcopy
 
+BLACK = 1
+WHITE = 2
+
+AI_FIRST = True
+
 #ai线程
 class AIThread(QThread):
     _signal = pyqtSignal(list)
@@ -20,8 +25,16 @@ class AIThread(QThread):
     def set_chessboard(self,chessboard):
         self.chessboard = chessboard
 
+    def set_color(self, color):
+        self.color = color
+
     def run(self):
-        ai = AlphaBetaAI(self.chessboard, 2) # my color: 2
+        # ai = AI(self.chessboard, self.color)
+        # values = -100000000
+        # record = [-1, -1, self.color]
+        # 记录values最大的那步棋下的位置
+
+        ai = AlphaBetaAI(self.chessboard, self.color) # my color: 2
         bestPos = ai.FindNextMove()
 
         # ai = newAI(self.chessboard)
@@ -32,9 +45,32 @@ class AIThread(QThread):
         # getBestPosition(color, alpha, beta, method) -> method represents the algorithm use
         # method = 1 -> alpha-beta pruning
         # method = 2 -> even better performance
-        # bestPos = ai.getBestPosition(2, alpha, beta, 2)
-
-        self._signal.emit([bestPos[0], bestPos[1], 2])
+        # bestPos = ai.getBestPosition(self.color, alpha, beta, 2)
+        """
+        for i in range(15):
+            for j in range(15):
+                # 如果该点为空，假设下在该点，修改棋盘状态
+                if self.chessboard[i][j][2] == 0:
+                    # 如果该点周围米字方向上两格都为空，就跳过该点(缩小落子范围,跳过离棋盘上其他棋子较远的点)
+                    if ai.judge_empty(i, j):
+                        continue
+                    self.chessboard[i][j][2] = self.color
+                    # 评估
+                    evaluate = ai.ai(3 - self.color,1,values)
+                    # # 如果当前白子下法能完成五连，则将evaluate设一个较大的值
+                    # if ai.judge(i, j):
+                    #     evaluate = 10000000
+                    #取评估值的最大值
+                    if evaluate >= values:
+                        values = evaluate
+                        record = [i, j, self.color]
+                    # 回溯
+                    self.chessboard[i][j][2] = 0
+        #print("{}:{}".format(0, values))
+        #print("剪枝次数：{}".format(ai.count))
+        self._signal.emit(record)
+        """
+        self._signal.emit([bestPos[0], bestPos[1], self.color])
 
 class GameTime(QThread):
     _signal = pyqtSignal(str)
@@ -76,7 +112,7 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
         self.white = QPixmap('./designer/image/white.png')
         self.mouse_point = LaBel(self)  # 将鼠标图片改为棋子
         self.mouse_point.setScaledContents(True)
-        self.mouse_point.setPixmap(self.black)  # 加载黑棋
+        # self.mouse_point.setPixmap(self.black)  # 加载黑棋
         self.mouse_point.setGeometry(1100, 750, 64, 64)
         self.pieces = [LaBel(self) for i in range(225)]  # 新建225个棋子标签，准备在棋盘上绘制棋子
         for piece in self.pieces:
@@ -92,7 +128,7 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
         self.ai = AIThread()
         self.ai._signal.connect(self.ai_draw)
         #要想鼠标不按下时的移动也能捕捉到，需要setMouseTracking(true)。
-        self.setMouseTracking(True)
+        # self.setMouseTracking(True)
         #棋局状态，1为开始对局，0为停止
         self.status = 1
         #设置已下步数
@@ -110,16 +146,30 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
             self.chessboard_position.append(deepcopy(temp))
             pos[1] += 64
             pos[0] = 40
-        #print(self.chessboard_position)
+        # print(self.chessboard_position)
+
+        self.human_color = BLACK
+        self.agent_color = WHITE
 
     def set_time(self,time):
-        self.label_3.setText("TIME：{}".format(time))
+        self.label_3.setText("TIME: {}".format(time))
 
     def mouseMoveEvent(self, e):  # 黑色棋子随鼠标移动
         # self.lb1.setText(str(e.x()) + ' ' + str(e.y()))
         self.mouse_point.move(e.x() - 16 , e.y() - 16)
     #玩家下棋
     def mousePressEvent(self, e):
+        if AI_FIRST and self.step == 0:
+            self.human_color = WHITE
+            self.agent_color = BLACK
+
+            # 锁定棋局状态，待ai下完后再放开
+            self.status = 0
+            self.label_7.setText("Let me think...")
+            #ai下棋
+            self.chessboard_position[7][7][2] = self.agent_color
+            self.ai_draw((7, 7, self.agent_color))
+
         #判断棋局状态
         if self.status == 0:
             return
@@ -135,9 +185,9 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
                     return
                 #print(x, y)
                 #画出棋子
-                self.draw(x,y,1)
+                self.draw(x,y,self.human_color)
                 # 更改棋盘点状态
-                self.chessboard_position[m][n][2] = 1
+                self.chessboard_position[m][n][2] = self.human_color
                 #判断输赢,根据结果决定是否继续棋局
                 if self.judge(m,n):
                     # 锁定棋局状态，待ai下完后再放开
@@ -145,6 +195,7 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
                     self.label_7.setText("Let me think...")
                     #ai下棋
                     self.ai.set_chessboard(self.chessboard_position)
+                    self.ai.set_color(self.agent_color)
                     self.ai.start()
             else:
                 print("Please play inside the chessboard!")
@@ -195,7 +246,7 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
                 result_label = LaBel(self)
                 result_label.setVisible(True)  # 图片可视
                 result_label.setScaledContents(True)  # 图片大小根据标签大小可变
-                if self.chessboard_position[m][n][2] == 1:
+                if self.chessboard_position[m][n][2] == BLACK:
                     print("Black win")
                     #计时停止
                     self.game_time.set_status(0)
@@ -203,9 +254,9 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
                     self.status = 0
                     #显示相关信息
                     #self.winner = LaBel(self)
-                    win = QPixmap('./designer/image/win-removebg-preview.png')
-                    result_label.setPixmap(win)
-                    result_label.setGeometry(140, 232, 700, 150)
+                    # win = QPixmap('./designer/image/win-removebg-preview.png')
+                    # result_label.setPixmap(win)
+                    # result_label.setGeometry(140, 232, 700, 150)
                     #结束棋局
                     return 0
                 else:
@@ -214,9 +265,9 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
                     self.game_time.set_status(0)
                     # 设置棋局状态为0
                     self.status = 0
-                    win = QPixmap('./designer/image/lost-removebg-preview.png')
-                    result_label.setPixmap(win)
-                    result_label.setGeometry(140, 232, 700, 150)
+                    # win = QPixmap('./designer/image/lost-removebg-preview.png')
+                    # result_label.setPixmap(win)
+                    # result_label.setGeometry(140, 232, 700, 150)
                     # 结束棋局
                     return 0
         #继续棋局
@@ -240,9 +291,9 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
         return ((x1-x2)**2 + (y1-y2)**2)**0.5
     #放置棋子
     def draw(self,i,j,a):
-        if a == 1:
+        if a == BLACK:
             self.pieces[self.step].setPixmap(self.black)  # 放置黑色棋子
-        elif a == 2:
+        elif a == WHITE:
             self.pieces[self.step].setPixmap(self.white)  # 放置白色棋子
         self.pieces[self.step].setGeometry(i,j,64,64) # 设置位置，大小
         self.step += 1
