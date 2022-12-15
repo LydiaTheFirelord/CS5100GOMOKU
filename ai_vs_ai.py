@@ -36,11 +36,11 @@ def single_run(agent_black, agent_white, print):
         return "tie"
 
 if __name__ == "__main__":
-    game = Game(NewAgent(), NewAlphaBetaAgent())
     agent1 = NewAgent()
     agent2 = NewAlphaBetaAgent()
 
-    result = {"agent1": 0, "agent2": 0, "tie": 0}
+    # result = {"agent1": 0, "agent2": 0, "tie": 0}
+    result = list()
     duration = list()
     for i in range(TEST_TIME):
         start = time.time()
@@ -48,11 +48,14 @@ if __name__ == "__main__":
         end = time.time()
         
         if winner == "black":
-            result["agent1"] += 1
+            # result["agent1"] += 1
+            result.append("agent1")
         elif winner == "white":
-            result["agent2"] += 1
+            # result["agent2"] += 1
+            result.append("agent2")
         else:
-            result["tie"] += 1
+            # result["tie"] += 1
+            result.append("tie")
         duration.append(end - start)
 
         # Switch color
@@ -61,11 +64,14 @@ if __name__ == "__main__":
         end = time.time()
         
         if winner == "black":
-            result["agent2"] += 1
+            # result["agent2"] += 1
+            result.append("agent2")
         elif winner == "white":
-            result["agent1"] += 1
+            # result["agent1"] += 1
+            result.append("agent1")
         else:
-            result["tie"] += 1
+            # result["tie"] += 1
+            result.append("tie")
         duration.append(end - start)
 
     print(result)
