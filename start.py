@@ -72,7 +72,6 @@ class AIThread(QThread):
         """
         self._signal.emit([bestPos[0], bestPos[1], self.color])
 
-#对局时间线程
 class GameTime(QThread):
     _signal = pyqtSignal(str)
 
