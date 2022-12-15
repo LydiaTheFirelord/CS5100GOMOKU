@@ -17,8 +17,8 @@ class newAI:
         self.searchRange = [[0 for _ in range(15)] for _ in range(15)]
 
         self.bestPos = (-1, -1)
-        self.maxDepth = 4 #default depth of search is 4
-        self.valueOfPos = collections.defaultdict(list) #Used for printing debug info
+        self.maxDepth = 3 #default depth of search is 4
+        self.valueOfPos = collections.defaultdict(set) #Used for printing debug info
 
     # Select an algorithm by method
     def getBestPosition(self, color, alpha, beta, method):
@@ -53,10 +53,8 @@ class newAI:
         self._init_black_white()
         self.searchRange = utils.getSearchRange(self.occupied)
         # Depth is 4
-        print("alpha beta called________________________")
         self._alpha_beta(color, self.maxDepth, alpha, beta)
         self.updateChessBoard()
-        print(self.valueOfPos)
         return self.bestPos
 
     def _alpha_beta(self, color, depth, alpha, beta):
@@ -92,7 +90,7 @@ class newAI:
                 value = -self._alpha_beta(newColor, depth - 1, -beta, -alpha)
 
                 if depth == 3 or depth == 4:
-                    self.valueOfPos[(i, j)].append([value, depth])
+                    self.valueOfPos[(i, j)].add((value, depth))
                 # put chess back
                 self.occupied[i][j] = 0
                 self.searchRange[i][j] = 1
