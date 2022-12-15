@@ -34,31 +34,8 @@ class AIThread(QThread):
         # method = 2 -> even better performance
         # bestPos = ai.getBestPosition(2, alpha, beta, 2)
 
-        """
-        for i in range(15):
-            for j in range(15):
-                # 如果该点为空，假设下在该点，修改棋盘状态
-                if self.chessboard[i][j][2] == 0:
-                    # 如果该点周围米字方向上两格都为空，就跳过该点(缩小落子范围,跳过离棋盘上其他棋子较远的点)
-
-                    self.chessboard[i][j][2] = 2
-                    # 评估
-                    evaluate = ai.alpha_beta(2, i, j)
-                    # # 如果当前白子下法能完成五连，则将evaluate设一个较大的值
-                    # if ai.judge(i, j):
-                    #     evaluate = 10000000
-                    #取评估值的最大值
-                    if evaluate >= alpha:
-                        alpha = evaluate
-                        record = [i, j, 2]
-                    # 回溯
-                    self.chessboard[i][j][2] = 0
-        #print("{}:{}".format(0, values))
-        #print("剪枝次数：{}".format(ai.count))
-        """
         self._signal.emit([bestPos[0], bestPos[1], 2])
 
-#对局时间线程
 class GameTime(QThread):
     _signal = pyqtSignal(str)
 
